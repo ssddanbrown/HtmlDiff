@@ -1,6 +1,6 @@
-<?php namespace HTMLDiff\Tests;
+<?php namespace Ssddanbrown\HtmlDiff\Tests;
 
-use HtmlDiff\Diff;
+use Ssddanbrown\HtmlDiff\Diff;
 use PHPUnit\Framework\TestCase;
 
 class HtmlDiffTest extends TestCase

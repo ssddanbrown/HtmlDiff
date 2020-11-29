@@ -1,12 +1,14 @@
 {
     "name": "ssddanbrown/htmldiff",
     "description": "HTML Content Diff Generator",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
+	"homepage": "https://github.com/ssddanbrown/htmldiff",
+	"license": "MIT",
+	"type": "library",
+	"authors": [
         {
             "name": "Dan Brown",
-            "email": "ssddanbrown@googlemail.com"
+            "email": "ssddanbrown@googlemail.com",
+			"role": "Developer"
         }
     ],
     "require": {
@@ -18,12 +20,16 @@
     },
 	"autoload": {
 		"psr-4": {
-			"HtmlDiff\\": "src/HtmlDiff/"
+			"Ssddanbrown\\HtmlDiff\\": "src"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"HtmlDiff\\Tests\\": "tests"
+			"Ssddanbrown\\HtmlDiff\\Tests\\": "tests"
 		}
+	},
+	"scripts": {
+		"test": "vendor/bin/phpunit",
+		"test-coverage": "vendor/bin/phpunit --coverage-html coverage"
 	}
 }

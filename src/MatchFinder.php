@@ -1,4 +1,4 @@
-<?php namespace HtmlDiff;
+<?php namespace Ssddanbrown\HtmlDiff;
 
 /**
  * Finds the longest match in given texts.

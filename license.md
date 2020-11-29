@@ -1,3 +1,5 @@
+MIT License
+
 Copyright (c) 2020 Nathan Herald, Rohland de Charmoy, Dan Brown
 
 Permission is hereby granted, free of charge, to any person obtaining
