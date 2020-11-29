@@ -291,15 +291,14 @@ class Diff
 
         $matches = $this->matchingBlocks();
 
-        $matches[] = new Match(count($this->oldWords), count($this->newWords), 0);
-
+        $matches[] = new DiffMatch(count($this->oldWords), count($this->newWords), 0);
 
         // Remove orphans from matches.
         // If distance between left and right matches is 4 times
         // longer than length of current match then it is considered as orphan.
         $matchesWithoutOrphans = $this->removeOrphans($matches);
 
-        /** @var Match $match */
+        /** @var DiffMatch $match */
         foreach ($matchesWithoutOrphans as $match) {
             $matchStartsAtCurrentPositionInOld = ($positionInOld === $match->startInOld);
             $matchStartsAtCurrentPositionInNew = ($positionInNew === $match->startInNew);
@@ -331,14 +330,14 @@ class Diff
 
     private function removeOrphans(array $matches)
     {
-        /** @var ?Match $prev */
+        /** @var ?DiffMatch $prev */
         $prev = null;
-        /** @var ?Match $curr */
+        /** @var ?DiffMatch $curr */
         $curr = null;
-        /** @var Match $next */
+        /** @var DiffMatch $next */
         foreach ($matches as $next) {
             if (is_null($curr)) {
-                $prev = new Match(0, 0, 0);
+                $prev = new DiffMatch(0, 0, 0);
                 $curr = $next;
                 continue;
             }
@@ -397,7 +396,7 @@ class Diff
         }
     }
 
-    private function findMatch(int $startInOld, int $endInOld, int $startInNew, int $endInNew): ?Match
+    private function findMatch(int $startInOld, int $endInOld, int $startInNew, int $endInNew): ?DiffMatch
     {
         // For large texts it is more likely that there is a Match of size bigger than maximum granularity.
         // If not then go down and try to find it with smaller granularity.

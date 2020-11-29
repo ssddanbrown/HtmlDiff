@@ -82,7 +82,7 @@ final class MatchFinder
         return $word;
     }
 
-    public function findMatch(): ?Match
+    public function findMatch(): ?DiffMatch
     {
         $this->indexNewWords();
         $this->removeRepeatingWords();
@@ -129,7 +129,7 @@ final class MatchFinder
             $matchLengthAt = $newMatchLengthAt;
         }
 
-        return ($bestMatchSize !== 0) ? new Match($bestMatchInOld, $bestMatchInNew, $bestMatchSize + $this->options->blockSize - 1) : null;
+        return ($bestMatchSize !== 0) ? new DiffMatch($bestMatchInOld, $bestMatchInNew, $bestMatchSize + $this->options->blockSize - 1) : null;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php namespace Ssddanbrown\HtmlDiff;
 
-class Match
+class DiffMatch
 {
     public $startInOld;
     public $startInNew;
