@@ -1,5 +1,7 @@
 # PHP HtmlDiff
 
+[![Build Status](https://github.com/ssddanbrown/htmldiff/workflows/phpunit/badge.svg)](https://github.com/ssddanbrown/htmldiff/actions)
+
 This library will compare two provided HTML string inputs and output HTML, tagged with the differences between the two.
 
 This is a PHP port of the [c# implementation found here](https://github.com/Rohland/htmldiff.net) which is a port of the [ruby implementation found here](https://github.com/myobie/htmldiff). Major credit to [@Rohland](https://github.com/Rohland) and [@myobie](https://github.com/myobie) for their original work which I have just simply translated to PHP.
