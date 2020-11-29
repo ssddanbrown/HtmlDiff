@@ -152,25 +152,25 @@ class Diff
 
     private function processInsertOperation(Operation $operation, string $cssClass): void
     {
-        $text = array_filter($this->newWords, function($s, $pos) use ($operation) {
+        $text = array_values(array_filter($this->newWords, function($s, $pos) use ($operation) {
             return $pos >= $operation->startInNew && $pos < $operation->endInNew;
-        }, ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_BOTH));
         $this->insertTag("ins", $cssClass, $text);
     }
 
     private function processDeleteOperation(Operation $operation, string $cssClass): void
     {
-        $text = array_filter($this->oldWords, function($s, $pos) use ($operation) {
+        $text = array_values(array_filter($this->oldWords, function($s, $pos) use ($operation) {
             return $pos >= $operation->startInOld && $pos < $operation->endInOld;
-        }, ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_BOTH));
         $this->insertTag("del", $cssClass, $text);
     }
 
     private function processEqualOperation(Operation $operation): void
     {
-        $result = array_filter($this->newWords, function($s, $pos) use ($operation) {
+        $result = array_values(array_filter($this->newWords, function($s, $pos) use ($operation) {
             return $pos >= $operation->startInNew && $pos < $operation->endInNew;
-        }, ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_BOTH));
         $this->content .= implode('', $result);
     }
 
@@ -190,7 +190,7 @@ class Diff
             }
 
             $nonTags = $this->extractConsecutiveWords($words, function($x) {
-                return !Utils::isTag($x);
+                return is_null($x) || !Utils::isTag($x);
             });
 
             $specialCaseTagInjection = "";
@@ -203,7 +203,7 @@ class Diff
                 // Check if the tag is a special case
                 if (preg_match(static::$specialCaseOpeningTagRegex, $words[0]) === 1) {
                     $this->specialTagDiffStack[] = $words[0];
-                    $specialCaseTagInjection = "<ins class='mod'>";
+                    $specialCaseTagInjection = "<ins class=\"mod\">";
                     if ($tag === "del") {
                         array_shift($words);
 
@@ -267,17 +267,17 @@ class Diff
         }
 
         if (!is_null($indexOfFirstTag)) {
-            $items = array_filter($words, function($s, $pos) use ($indexOfFirstTag) {
+            $items = array_values(array_filter($words, function($s, $pos) use ($indexOfFirstTag) {
                 return $pos >= 0 && $pos < $indexOfFirstTag;
-            }, ARRAY_FILTER_USE_BOTH);
+            }, ARRAY_FILTER_USE_BOTH));
             if ($indexOfFirstTag > 0) {
                 array_splice($words, 0, $indexOfFirstTag);
             }
             return $items;
         } else {
-            $items = array_filter($words, function($s, $pos) use ($words) {
+            $items = array_values(array_filter($words, function($s, $pos) use ($words) {
                 return $pos >= 0 && $pos <= count($words);
-            }, ARRAY_FILTER_USE_BOTH);
+            }, ARRAY_FILTER_USE_BOTH));
             array_splice($words, 0, count($words));
             return $items;
         }

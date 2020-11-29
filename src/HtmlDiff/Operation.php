@@ -17,6 +17,9 @@ class Operation
         $this->endInNew = $endInNew;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function debug_printDebugInfo(array $oldWords, array $newWords): void
     {
         $oldText = implode('', array_filter($oldWords, function($v, $i) {

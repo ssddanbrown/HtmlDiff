@@ -20,5 +20,10 @@
 		"psr-4": {
 			"HtmlDiff\\": "src/HtmlDiff/"
 		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"HtmlDiff\\Tests\\": "tests"
+		}
 	}
 }

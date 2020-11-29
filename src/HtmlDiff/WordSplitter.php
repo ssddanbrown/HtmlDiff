@@ -88,7 +88,7 @@ class WordSplitter
 
                         $mode = Utils::isWhiteSpace($character) ? Mode::WHITESPACE : Mode::CHARACTER;
                     } else {
-                        $currentWord[] = $character;
+                        $currentWord .= $character;
                     }
 
                     break;
@@ -189,13 +189,15 @@ class WordSplitter
 
         foreach ($blockExpressions as $exp) {
             $matches = [];
-            preg_match_all($exp, $text, $matches);
-            foreach ($matches[0] as $index => $match) {
-                if (isset($blockLocations[$index])) {
+            preg_match_all($exp, $text, $matches, PREG_OFFSET_CAPTURE);
+            foreach ($matches[0] as $matchAndOffset) {
+                $match = $matchAndOffset[0];
+                $offset = $matchAndOffset[1];
+                if (isset($blockLocations[$offset])) {
                     throw new Exception("One or more block expressions result in a text sequence that overlaps. Current expression: {$exp}");
                 }
 
-                $blockLocations[$index] = $index + mb_strlen($match);
+                $blockLocations[$offset] = $offset + mb_strlen($match);
             }
         }
 

@@ -4,7 +4,7 @@ class Utils
 {
     // TODO - Check escaping here
     private static $openingTagRegex = '/^\s*<[^>]+>\s*$/';
-    private static $closingTagRegex = '/^\s*</[^>]+>\s*$/';
+    private static $closingTagRegex = '/^\s*<\/[^>]+>\s*$/';
     private static $tagWordRegex = '/<[^\s>]+/';
     private static $whitespaceRegex = '/^(\s|&nbsp;)+$/';
     private static $wordRegex = '/[\w\#@]+/';
@@ -43,7 +43,7 @@ class Utils
 
     public static function wrapText(string $text, string $tagName, string $cssClass): string
     {
-        return "<{$tagName} class='{$cssClass}'>{$text}</{$tagName}>";
+        return "<{$tagName} class=\"{$cssClass}\">{$text}</{$tagName}>";
     }
 
     public static function isStartOfTag(string $val): bool
