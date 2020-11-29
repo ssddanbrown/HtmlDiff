@@ -77,7 +77,7 @@ class Diff
         $this->oldText = $oldText;
     }
 
-    public static function exceute(string $oldText, string $newText): string
+    public static function excecute(string $oldText, string $newText): string
     {
         return (new static($oldText, $newText))->build();
     }
@@ -91,7 +91,17 @@ class Diff
             return $this->newText;
         }
 
-        // TODO
+        $this->splitInputIntoWords();
+
+        $this->matchGranularity = min($this->matchGranularityMaximum, min(count($this->oldWords), count($this->newWords)));
+
+        $operations = $this->operations();
+
+        foreach ($operations as $item) {
+            $this->performOperation($item);
+        }
+
+        return $this->content;
     }
 
     /**
@@ -116,9 +126,259 @@ class Diff
 
     private function performOperation(Operation $operation): void
     {
-        // TODO
+        switch ($operation->action) {
+            case Action::EQUAL:
+                $this->processEqualOperation($operation);
+                break;
+            case Action::DELETE:
+                $this->processDeleteOperation($operation, "diffdel");
+                break;
+            case Action::INSERT:
+                $this->processInsertOperation($operation, "diffins");
+                break;
+            case Action::NONE:
+                break;
+            case Action::REPLACE:
+                $this->processReplaceOperation($operation);
+                break;
+        }
     }
 
+    private function processReplaceOperation(Operation $operation): void
+    {
+        $this->processDeleteOperation($operation, "diffmod");
+        $this->processInsertOperation($operation, "diffmod");
+    }
+
+    private function processInsertOperation(Operation $operation, string $cssClass): void
+    {
+        $text = array_filter($this->newWords, function($s, $pos) use ($operation) {
+            return $pos >= $operation->startInNew && $pos < $operation->endInNew;
+        }, ARRAY_FILTER_USE_BOTH);
+        $this->insertTag("ins", $cssClass, $text);
+    }
+
+    private function processDeleteOperation(Operation $operation, string $cssClass): void
+    {
+        $text = array_filter($this->oldWords, function($s, $pos) use ($operation) {
+            return $pos >= $operation->startInOld && $pos < $operation->endInOld;
+        }, ARRAY_FILTER_USE_BOTH);
+        $this->insertTag("del", $cssClass, $text);
+    }
+
+    private function processEqualOperation(Operation $operation): void
+    {
+        $result = array_filter($this->newWords, function($s, $pos) use ($operation) {
+            return $pos >= $operation->startInNew && $pos < $operation->endInNew;
+        }, ARRAY_FILTER_USE_BOTH);
+        $this->content .= implode('', $result);
+    }
+
+    /**
+     * This method encloses words within a specified tag (ins or del), and adds this into "content",
+     * with a twist: if there are words contain tags, it actually creates multiple ins or del,
+     * so that they don't include any ins or del. This still doesn't guarantee valid HTML
+     * (hint: think about diffing a text containing ins or del tags), but handles correctly more cases
+     * than the earlier version.
+     * P.S.: Spare a thought for people who write HTML browsers. They live in this ... every day.
+     */
+    private function insertTag(string $tag, string $cssClass, array $words): void
+    {
+        while(true) {
+            if (count($words) === 0) {
+                break;
+            }
+
+            $nonTags = $this->extractConsecutiveWords($words, function($x) {
+                return !Utils::isTag($x);
+            });
+
+            $specialCaseTagInjection = "";
+            $specialCaseTagInjectionIsBefore = false;
+
+            if (count($nonTags) !== 0) {
+                $text = Utils::wrapText(implode('', $nonTags), $tag, $cssClass);
+                $this->content .= $text;
+            } else {
+                // Check if the tag is a special case
+                if (preg_match(static::$specialCaseOpeningTagRegex, $words[0]) === 1) {
+                    $this->specialTagDiffStack[] = $words[0];
+                    $specialCaseTagInjection = "<ins class='mod'>";
+                    if ($tag === "del") {
+                        array_shift($words);
+
+                        // following tags may be formatting tags as well, follow through
+                        while (count($words) > 0 && preg_match(static::$specialCaseOpeningTagRegex, $words[0]) === 1) {
+                            array_shift($words);
+                        }
+                    }
+                } else if (isset(static::$specialCaseClosingTags[strtolower($words[0])])) {
+                    $openingTag = count($this->specialTagDiffStack) === 0 ? null : array_pop($this->specialTagDiffStack);
+
+                    // If we didn't have an opening tag, and we don't have a match with the previous tag used
+                    if (is_null($openingTag) || $openingTag !== str_replace('/', '', end($words))) {
+                        // Do nothing
+                    } else {
+                        $specialCaseTagInjection = "</ins>";
+                        $specialCaseTagInjectionIsBefore = true;
+                    }
+
+                    if ($tag === "del") {
+                        array_shift($words);
+
+                        // Following tags may be formatting tags as well, follow through
+                        while (count($words) > 0 && isset(static::$specialCaseClosingTags[strtolower($words[0])])) {
+                            array_shift($words);
+                        }
+                    }
+                }
+            }
+
+            if (count($words) === 0 && strlen($specialCaseTagInjection) === 0) {
+                break;
+            }
+
+            $isTagCallback = function($string) {
+                return Utils::isTag($string);
+            };
+            if ($specialCaseTagInjectionIsBefore) {
+                $this->content .= $specialCaseTagInjection . implode('', $this->extractConsecutiveWords($words, $isTagCallback));
+            } else {
+                $this->content .= implode('', $this->extractConsecutiveWords($words, $isTagCallback)) . $specialCaseTagInjection;
+            }
+        }
+    }
+
+    private function extractConsecutiveWords(array &$words, callable $condition): array
+    {
+        $indexOfFirstTag = null;
+
+        for ($i = 0; $i < count($words); $i++) {
+            $word = $words[$i];
+
+            if ($i === 0 && $word == " ") {
+                $words[$i] = "&nbsp;";
+            }
+
+            if (!$condition($word)) {
+                $indexOfFirstTag = $i;
+                break;
+            }
+        }
+
+        if (!is_null($indexOfFirstTag)) {
+            $items = array_filter($words, function($s, $pos) use ($indexOfFirstTag) {
+                return $pos >= 0 && $pos < $indexOfFirstTag;
+            }, ARRAY_FILTER_USE_BOTH);
+            if ($indexOfFirstTag > 0) {
+                array_splice($words, 0, $indexOfFirstTag);
+            }
+            return $items;
+        } else {
+            $items = array_filter($words, function($s, $pos) use ($words) {
+                return $pos >= 0 && $pos <= count($words);
+            }, ARRAY_FILTER_USE_BOTH);
+            array_splice($words, 0, count($words));
+            return $items;
+        }
+    }
+
+    private function operations(): array
+    {
+        $positionInOld = 0;
+        $positionInNew = 0;
+        $operations = [];
+
+        $matches = $this->matchingBlocks();
+
+        $matches[] = new Match(count($this->oldWords), count($this->newWords), 0);
+
+
+        // Remove orphans from matches.
+        // If distance between left and right matches is 4 times
+        // longer than length of current match then it is considered as orphan.
+        $matchesWithoutOrphans = $this->removeOrphans($matches);
+
+        /** @var Match $match */
+        foreach ($matchesWithoutOrphans as $match) {
+            $matchStartsAtCurrentPositionInOld = ($positionInOld === $match->startInOld);
+            $matchStartsAtCurrentPositionInNew = ($positionInNew === $match->startInNew);
+
+            if (!$matchStartsAtCurrentPositionInOld && !$matchStartsAtCurrentPositionInNew) {
+                $action = Action::REPLACE;
+            } else if ($matchStartsAtCurrentPositionInOld && !$matchStartsAtCurrentPositionInNew) {
+                $action = Action::INSERT;
+            } else if (!$matchStartsAtCurrentPositionInOld) {
+                $action = Action::DELETE;
+            } else {
+                $action = Action::NONE;
+            }
+
+            if ($action !== Action::NONE) {
+                $operations[] = new Operation($action, $positionInOld, $match->startInOld, $positionInNew, $match->startInNew);
+            }
+
+            if ($match->size !== 0) {
+                $operations[] = new Operation(Action::EQUAL, $match->startInOld, $match->getEndInOld(), $match->startInNew, $match->getEndInNew());
+            }
+
+            $positionInOld = $match->getEndInOld();
+            $positionInNew = $match->getEndInNew();
+        }
+
+        return $operations;
+    }
+
+    private function removeOrphans(array $matches)
+    {
+        /** @var ?Match $prev */
+        $prev = null;
+        /** @var ?Match $curr */
+        $curr = null;
+        /** @var Match $next */
+        foreach ($matches as $next) {
+            if (is_null($curr)) {
+                $prev = new Match(0, 0, 0);
+                $curr = $next;
+                continue;
+            }
+
+            // if match has no diff on the left or on the right
+            if ($prev->getEndInOld() === $curr->startInOld && $prev->getEndInNew() === $curr->startInNew
+                || $curr->getEndInOld() === $next->startInOld && $curr->getEndInNew() === $next->startInNew
+            ) {
+                yield $curr;
+                $prev = $curr;
+                $curr = $next;
+                continue;
+            }
+
+            $oldDistanceInChars = array_sum(array_map(function($i) {
+                return mb_strlen($this->oldWords[$i]);
+            }, range($prev->getEndInOld(), $next->startInOld - $prev->getEndInOld())));
+            $newDistanceInChars = array_sum(array_map(function($i) {
+                return mb_strlen($this->newWords[$i]);
+            }, range($prev->getEndInNew(), $next->startInNew - $prev->getEndInNew())));
+            $currMatchLengthInChars = array_sum(array_map(function($i) {
+                return mb_strlen($this->newWords[$i]);
+            }, range($curr->startInNew, $curr->getEndInNew() - $curr->startInNew)));
+            if ($currMatchLengthInChars > max($oldDistanceInChars, $newDistanceInChars) * $this->orphanMatchThreshold) {
+                yield $curr;
+            }
+
+            $prev = $curr;
+            $curr = $next;
+        }
+
+        yield $curr; //assume that the last match is always vital
+    }
+
+    private function matchingBlocks(): array
+    {
+        $matchingBlocks = [];
+        $this->findMatchingBlocks(0, count($this->oldWords), 0, count($this->newWords), $matchingBlocks);
+        return $matchingBlocks;
+    }
 
     private function findMatchingBlocks(int $startInOld, int $endInOld, int $startInNew, int $endInNew, array &$matchingBlocks): void
     {
