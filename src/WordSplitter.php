@@ -20,9 +20,10 @@ class WordSplitter
         $isGrouping = false;
         $groupingUntil = -1;
 
-        for ($index = 0; $index < mb_strlen($text); $index++)
+        $length = strlen($text);
+        for ($index = 0; $index < $length; $index++)
         {
-            $character = mb_substr($text, $index, 1);
+            $character = substr($text, $index, 1);
 
             // Don't bother executing block checks if we don't have any blocks to check for!
             if ($isBlockCheckRequired) {
@@ -51,28 +52,28 @@ class WordSplitter
             switch ($mode) {
                 case Mode::CHARACTER:
                     if (Utils::isStartOfTag($character)) {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = "<";
                         $mode = Mode::TAG;
                     } else if (Utils::isStartOfEntity($character)) {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
                         $mode = Mode::ENTITY;
                     } else if (Utils::isWhiteSpace($character)) {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
                         $mode = Mode::WHITESPACE;
                     } else if (Utils::isWord($character) &&
-                        (mb_strlen($currentWord) === 0) || Utils::isWord(substr($currentWord, -1))) {
+                        (strlen($currentWord) === 0) || Utils::isWord(substr($currentWord, -1))) {
                         $currentWord .= $character;
                     } else {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
@@ -96,13 +97,13 @@ class WordSplitter
 
                     if (Utils::isStartOfTag($character))
                     {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
                         $mode = Mode::TAG;
                     } else if (Utils::isStartOfEntity($character)) {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
@@ -110,7 +111,7 @@ class WordSplitter
                     } else if (Utils::isWhiteSpace($character)) {
                         $currentWord .= $character;
                     } else {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
@@ -122,20 +123,20 @@ class WordSplitter
 
                     if (Utils::isStartOfTag($character))
                     {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
                         $mode = Mode::TAG;
                     } else if (Utils::isWhiteSpace($character)) {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
                         $mode = Mode::WHITESPACE;
                     } else if (Utils::isEndOfEntity($character)) {
                         $switchToNextMode = true;
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $currentWord .= $character;
                             $words[] = $currentWord;
 
@@ -158,7 +159,7 @@ class WordSplitter
                     } else if (Utils::isWord($character)) {
                         $currentWord .= $character;
                     } else {
-                        if (mb_strlen($currentWord) !== 0) {
+                        if (strlen($currentWord) !== 0) {
                             $words[] = $currentWord;
                         }
                         $currentWord = $character;
@@ -168,7 +169,7 @@ class WordSplitter
             }
         }
 
-        if (mb_strlen($currentWord) !== 0) {
+        if (strlen($currentWord) !== 0) {
             $words[] = $currentWord;
         }
 

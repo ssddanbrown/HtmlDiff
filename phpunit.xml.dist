@@ -4,6 +4,8 @@
          backupStaticAttributes="false"
          colors="true"
          verbose="true"
+         enforceTimeLimit="false"
+         defaultTimeLimit="5"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
