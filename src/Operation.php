@@ -22,10 +22,10 @@ class Operation
      */
     public function debug_printDebugInfo(array $oldWords, array $newWords): void
     {
-        $oldText = implode('', array_filter($oldWords, function($v, $i) {
+        $oldText = implode('', array_filter($oldWords, function(string $v, int $i) {
             return $i >= $this->startInOld && $i < $this->endInOld;
         }, ARRAY_FILTER_USE_BOTH));
-        $newText = implode('', array_filter($newWords, function($v, $i) {
+        $newText = implode('', array_filter($newWords, function(string $v, int $i) {
             return $i >= $this->startInNew && $i < $this->endInNew;
         }, ARRAY_FILTER_USE_BOTH));
         echo "Operation: {$this->action}, Old Text: {$oldText}, New Text: {$newText}";

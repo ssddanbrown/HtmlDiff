@@ -8,8 +8,9 @@ class WordSplitter
     /**
      * Converts Html text into a list of words
      * @throws Exception
+     * @returns string[]
      */
-    public static function convertHtmlToListOfWords(string $text, array $blockExpressions)
+    public static function convertHtmlToListOfWords(string $text, array $blockExpressions): array
     {
         $mode = Mode::CHARACTER;
         $currentWord = "";

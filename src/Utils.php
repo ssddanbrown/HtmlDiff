@@ -2,18 +2,40 @@
 
 class Utils
 {
+    /**
+     * @var string
+     */
     private static $openingTagRegex = '/^\s*<[^>]+>\s*$/';
+
+    /**
+     * @var string
+     */
     private static $closingTagRegex = '/^\s*<\/[^>]+>\s*$/';
+
+    /**
+     * @var string
+     */
     private static $tagWordRegex = '/<[^\s>]+/';
+
+    /**
+     * @var string
+     */
     private static $whitespaceRegex = '/^(\s|&nbsp;)+$/';
+
+    /**
+     * @var string
+     */
     private static $wordRegex = '/[\w\#@]+/';
 
+    /**
+     * @var string[]
+     */
     private static $specialCaseWordTags = ["<img"];
 
     public static function isTag(string $item): bool
     {
-        $specials = array_filter(static::$specialCaseWordTags, function($val) use ($item) {
-            return !is_null($val) && strpos($item, $val) === 0;
+        $specials = array_filter(static::$specialCaseWordTags, function(string $val) use ($item) {
+            return strpos($item, $val) === 0;
         });
 
         if (count($specials) > 0) {

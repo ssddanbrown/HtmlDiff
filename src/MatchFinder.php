@@ -16,7 +16,7 @@ final class MatchFinder
     /**
      * @var array<String, array<int>>
      */
-    private $wordIndices;
+    private $wordIndices = [];
 
     private $options;
 
