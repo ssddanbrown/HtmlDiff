@@ -66,6 +66,12 @@ The `$expression` passed to the method must be a valid PHP regex pattern string.
 
 This package is built to very closely follow the code and structure of the [c#](https://github.com/Rohland/htmldiff.net) library that it was originally ported from. It will remain closely aligned for this original release but may deviate in the future. 
 
+[Psalm](https://psalm.dev/) is included for static analysis. It can be run like so:
+
+```bash
+./vendor/bin/psalm
+```
+
 ## License
 
 This project, and the projects that this library has been ported from, is licensed under the MIT License. See the [license file](https://github.com/ssddanbrown/htmldiff/blob/master/license.md) for more info.

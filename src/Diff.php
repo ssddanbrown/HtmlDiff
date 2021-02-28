@@ -1,5 +1,7 @@
 <?php namespace Ssddanbrown\HtmlDiff;
 
+use Generator;
+
 class Diff
 {
 
@@ -328,20 +330,15 @@ class Diff
         return $operations;
     }
 
-    private function removeOrphans(array $matches)
+    /**
+     * @param DiffMatch[] $matches
+     */
+    private function removeOrphans(array $matches): Generator
     {
-        /** @var ?DiffMatch $prev */
-        $prev = null;
-        /** @var ?DiffMatch $curr */
-        $curr = null;
-        /** @var DiffMatch $next */
-        foreach ($matches as $next) {
-            if (is_null($curr)) {
-                $prev = new DiffMatch(0, 0, 0);
-                $curr = $next;
-                continue;
-            }
+        $prev = new DiffMatch(0, 0, 0);
+        $curr = $matches[0] ?? new DiffMatch(0, 0, 0);
 
+        foreach (array_slice($matches, 1) as $index => $next) {
             // if match has no diff on the left or on the right
             if ($prev->getEndInOld() === $curr->startInOld && $prev->getEndInNew() === $curr->startInNew
                 || $curr->getEndInOld() === $next->startInOld && $curr->getEndInNew() === $next->startInNew
