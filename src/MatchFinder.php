@@ -6,11 +6,34 @@
  */
 final class MatchFinder
 {
+    /**
+     * @var string[]
+     */
     private $oldWords;
+
+    /**
+     * @var string[]
+     */
     private $newWords;
+
+    /**
+     * @var int
+     */
     private $startInOld;
+
+    /**
+     * @var int
+     */
     private $endInOld;
+
+    /**
+     * @var int
+     */
     private $startInNew;
+
+    /**
+     * @var int
+     */
     private $endInNew;
 
     /**
@@ -20,6 +43,10 @@ final class MatchFinder
 
     private $options;
 
+    /**
+     * @param string[] $oldWords
+     * @param string[] $newWords
+     */
     public function __construct(
         array $oldWords,
         array $newWords,
@@ -58,6 +85,9 @@ final class MatchFinder
         }
     }
 
+    /**
+     * @param string[] $block
+     */
     private static function putNewWord(array &$block, string $word, int $blockSize): ?string
     {
         array_push($block, $word);

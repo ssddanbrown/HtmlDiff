@@ -218,6 +218,7 @@ class Diff
      * (hint: think about diffing a text containing ins or del tags), but handles correctly more cases
      * than the earlier version.
      * P.S.: Spare a thought for people who write HTML browsers. They live in this ... every day.
+     * @param string[] $words
      */
     private function insertTag(string $tag, string $cssClass, array $words): void
     {
@@ -325,6 +326,9 @@ class Diff
         }
     }
 
+    /**
+     * @return Operation[]
+     */
     private function operations(): array
     {
         $positionInOld = 0;
@@ -409,13 +413,20 @@ class Diff
         yield $curr; //assume that the last match is always vital
     }
 
+    /**
+     * @return DiffMatch[]
+     */
     private function matchingBlocks(): array
     {
         $matchingBlocks = [];
         $this->findMatchingBlocks(0, count($this->oldWords), 0, count($this->newWords), $matchingBlocks);
+        /** @var DiffMatch[] $matchingBlocks */
         return $matchingBlocks;
     }
 
+    /**
+     * @param DiffMatch[] $matchingBlocks
+     */
     private function findMatchingBlocks(int $startInOld, int $endInOld, int $startInNew, int $endInNew, array &$matchingBlocks): void
     {
         $match = $this->findMatch($startInOld, $endInOld, $startInNew, $endInNew);

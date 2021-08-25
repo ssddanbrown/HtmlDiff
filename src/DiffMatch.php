@@ -25,6 +25,7 @@ class DiffMatch
 
     /**
      * @codeCoverageIgnore
+     * @param string[] $oldWords
      */
     public function debug_printWordsFromOld(array $oldWords): void
     {
@@ -37,6 +38,7 @@ class DiffMatch
 
     /**
      * @codeCoverageIgnore
+     * @param string[] $newWords
      */
     public function debug_printWordsFromNew(array $newWords): void
     {

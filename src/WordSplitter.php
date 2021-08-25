@@ -8,7 +8,8 @@ class WordSplitter
     /**
      * Converts Html text into a list of words
      * @throws Exception
-     * @returns string[]
+     * @param string[] $blockExpressions
+     * @return string[]
      */
     public static function convertHtmlToListOfWords(string $text, array $blockExpressions): array
     {
@@ -179,10 +180,12 @@ class WordSplitter
 
     /**
      * Finds any blocks that need to be grouped.
+     * @param string[]|null $blockExpressions
+     * @return array<int, int>
      */
     private static function findBlocks(string $text, array $blockExpressions = null): array
     {
-        /** @var int[] $blockLocations */
+        /** @var array<int, int> $blockLocations */
         $blockLocations = [];
 
         if (is_null($blockExpressions)) {
@@ -194,6 +197,7 @@ class WordSplitter
             preg_match_all($exp, $text, $matches, PREG_OFFSET_CAPTURE);
             foreach ($matches[0] as $matchAndOffset) {
                 $match = $matchAndOffset[0];
+                /** @var int $offset */
                 $offset = $matchAndOffset[1];
                 if (isset($blockLocations[$offset])) {
                     throw new Exception("One or more block expressions result in a text sequence that overlaps. Current expression: {$exp}");

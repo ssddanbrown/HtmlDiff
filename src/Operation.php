@@ -19,6 +19,8 @@ class Operation
 
     /**
      * @codeCoverageIgnore
+     * @param string[] $oldWords
+     * @param string[] $newWords
      */
     public function debug_printDebugInfo(array $oldWords, array $newWords): void
     {
