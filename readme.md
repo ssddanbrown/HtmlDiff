@@ -1,8 +1,8 @@
 # PHP HtmlDiff
 
 [![Build Status](https://github.com/ssddanbrown/htmldiff/workflows/phpunit/badge.svg)](https://github.com/ssddanbrown/htmldiff/actions)
-[![Latest Stable Version](https://poser.pugx.org/ssddanbrown/htmldiff/v)](//packagist.org/packages/ssddanbrown/htmldiff)
-[![Total Downloads](https://poser.pugx.org/ssddanbrown/htmldiff/downloads)](//packagist.org/packages/ssddanbrown/htmldiff)
+[![Latest Stable Version](https://poser.pugx.org/ssddanbrown/htmldiff/v)](https://packagist.org/packages/ssddanbrown/htmldiff)
+[![Total Downloads](https://poser.pugx.org/ssddanbrown/htmldiff/downloads)](https://packagist.org/packages/ssddanbrown/htmldiff)
 
 
 This library will compare two provided HTML string inputs and output HTML, tagged with the differences between the two.
@@ -73,6 +73,12 @@ This package is built to very closely follow the code and structure of the [c#](
 
 ```bash
 ./vendor/bin/psalm
+```
+
+[PHPUnit](https://phpunit.de/) is used for testing. It can be run like so:
+
+```bash
+./vendor/bin/phpunit
 ```
 
 ## License
