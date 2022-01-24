@@ -22,10 +22,29 @@ class WordSplitter
         $isGrouping = false;
         $groupingUntil = -1;
 
-        $length = mb_strlen($text);
+        $length = strlen($text);
+        $mbCharLength = 0;
+        $character = "";
         for ($index = 0; $index < $length; $index++)
         {
-            $character = mb_substr($text, $index, 1);
+            $currentCharacter = substr($text, $index, 1);
+
+            // Join multibyte characters together if we're in one
+            if ($mbCharLength > 1) {
+                $mbCharLength--;
+                $character .= $currentCharacter;
+                if ($mbCharLength !== 1) {
+                    continue;
+                }
+            } else {
+                // Check if we're in a multibyte character
+                $currentCharVal = ord($currentCharacter);
+                $character = $currentCharacter;
+                if ($currentCharVal >= 192) {
+                    $mbCharLength = ($currentCharVal >= 240) ? 4 : (($currentCharVal >= 224) ? 3 : 2);
+                    continue;
+                }
+            }
 
             // Don't bother executing block checks if we don't have any blocks to check for!
             if ($isBlockCheckRequired) {
@@ -72,7 +91,7 @@ class WordSplitter
                         $currentWord = $character;
                         $mode = Mode::WHITESPACE;
                     } else if (Utils::isWord($character) &&
-                        (strlen($currentWord) === 0) || Utils::isWord(mb_substr($currentWord, -1))) {
+                        (strlen($currentWord) === 0) || Utils::isWord(substr($currentWord, -1))) {
                         $currentWord .= $character;
                     } else {
                         if (strlen($currentWord) !== 0) {
