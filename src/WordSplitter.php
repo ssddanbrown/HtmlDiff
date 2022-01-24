@@ -22,10 +22,10 @@ class WordSplitter
         $isGrouping = false;
         $groupingUntil = -1;
 
-        $length = strlen($text);
+        $length = mb_strlen($text);
         for ($index = 0; $index < $length; $index++)
         {
-            $character = substr($text, $index, 1);
+            $character = mb_substr($text, $index, 1);
 
             // Don't bother executing block checks if we don't have any blocks to check for!
             if ($isBlockCheckRequired) {
@@ -72,7 +72,7 @@ class WordSplitter
                         $currentWord = $character;
                         $mode = Mode::WHITESPACE;
                     } else if (Utils::isWord($character) &&
-                        (strlen($currentWord) === 0) || Utils::isWord(substr($currentWord, -1))) {
+                        (strlen($currentWord) === 0) || Utils::isWord(mb_substr($currentWord, -1))) {
                         $currentWord .= $character;
                     } else {
                         if (strlen($currentWord) !== 0) {
