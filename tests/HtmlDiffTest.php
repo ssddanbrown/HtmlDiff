@@ -110,4 +110,10 @@ class HtmlDiffTest extends TestCase
 
         $this->assertEquals('This is a date<del class="diffmod"> 1 Jan 2016</del><ins class="diffmod"> 22 Feb 2017</ins> that <del class="diffmod">will</del><ins class="diffmod">did</ins> change', $output);
     }
+
+    public function test_newlines_changes_between_tags_is_tracked()
+    {
+        $output = Diff::excecute("<p>Section A</p><p>Section B</p>", "<p>Section A</p>\n\n<p>Section B</p>");
+        $this->assertEquals("<p>Section A</p><ins class=\"diffins\">\n\n</ins><p>Section B</p>", $output);
+    }
 }
