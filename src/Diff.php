@@ -394,13 +394,13 @@ class Diff
             }
 
             $oldDistanceInChars = array_sum(array_map(function($i) {
-                return mb_strlen($this->oldWords[$i]);
+                return isset($this->oldWords[$i]) ? mb_strlen($this->oldWords[$i]) : 0;
             }, range($prev->getEndInOld(), $next->startInOld - $prev->getEndInOld())));
             $newDistanceInChars = array_sum(array_map(function($i) {
-                return mb_strlen($this->newWords[$i]);
+                return isset($this->newWords[$i]) ? mb_strlen($this->newWords[$i]) : 0;
             }, range($prev->getEndInNew(), $next->startInNew - $prev->getEndInNew())));
             $currMatchLengthInChars = array_sum(array_map(function($i) {
-                return mb_strlen($this->newWords[$i]);
+                return isset($this->newWords[$i]) ? mb_strlen($this->newWords[$i]) : 0;
             }, range($curr->startInNew, $curr->getEndInNew() - $curr->startInNew)));
             if ($currMatchLengthInChars > max($oldDistanceInChars, $newDistanceInChars) * $this->orphanMatchThreshold) {
                 yield $curr;
