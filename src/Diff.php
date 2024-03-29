@@ -382,7 +382,7 @@ class Diff
         $prev = new DiffMatch(0, 0, 0);
         $curr = $matches[0] ?? new DiffMatch(0, 0, 0);
 
-        foreach (array_slice($matches, 1) as $index => $next) {
+        foreach (array_slice($matches, 1) as $next) {
             // if match has no diff on the left or on the right
             if ($prev->getEndInOld() === $curr->startInOld && $prev->getEndInNew() === $curr->startInNew
                 || $curr->getEndInOld() === $next->startInOld && $curr->getEndInNew() === $next->startInNew
@@ -395,13 +395,13 @@ class Diff
 
             $oldDistanceInChars = array_sum(array_map(function($i) {
                 return mb_strlen($this->oldWords[$i]);
-            }, range($prev->getEndInOld(), $next->startInOld - $prev->getEndInOld())));
+            }, range($prev->getEndInOld(), $next->startInOld - 1)));
             $newDistanceInChars = array_sum(array_map(function($i) {
                 return mb_strlen($this->newWords[$i]);
-            }, range($prev->getEndInNew(), $next->startInNew - $prev->getEndInNew())));
+            }, range($prev->getEndInNew(), $next->startInNew - 1)));
             $currMatchLengthInChars = array_sum(array_map(function($i) {
                 return mb_strlen($this->newWords[$i]);
-            }, range($curr->startInNew, $curr->getEndInNew() - $curr->startInNew)));
+            }, range($curr->startInNew, $curr->getEndInNew() - 1)));
             if ($currMatchLengthInChars > max($oldDistanceInChars, $newDistanceInChars) * $this->orphanMatchThreshold) {
                 yield $curr;
             }

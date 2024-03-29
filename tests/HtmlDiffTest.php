@@ -116,4 +116,10 @@ class HtmlDiffTest extends TestCase
         $output = Diff::excecute("<p>Section A</p><p>Section B</p>", "<p>Section A</p>\n\n<p>Section B</p>");
         $this->assertEquals("<p>Section A</p><ins class=\"diffins\">\n\n</ins><p>Section B</p>", $output);
     }
+
+    public function test_edge_changes_result_as_expected()
+    {
+        $output = Diff::excecute("AAA BBB CCC", "ZZZ BBB YYY");
+        $this->assertEquals('<del class="diffmod">AAA</del><ins class="diffmod">ZZZ</ins> BBB <del class="diffmod">CCC</del><ins class="diffmod">YYY</ins>', $output);
+    }
 }
